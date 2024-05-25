@@ -6,14 +6,18 @@ import { config } from '@auth/config';
 import { checkConnection } from '@auth/elasticsearch';
 import { appRoutes } from '@auth/routes';
 import { Logger } from 'winston';
+import { Channel } from 'amqplib';
 import { Application, NextFunction, Request, Response, json, urlencoded } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
+import { createConnectionAndChannel } from '@auth/queues/connection';
 
 const SERVER_PORT = 4002;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'authenticationServer', 'debug');
+
+export let authChannel: Channel;
 
 export function start(app: Application): void {
   securityMiddleware(app);
@@ -54,7 +58,8 @@ function routesMiddleware(app: Application): void {
   appRoutes(app);
 }
 
-function startQueues() {
+async function startQueues(): Promise<void> {
+  authChannel = await createConnectionAndChannel() as Channel;
 }
 
 function startElasticSearchServer(): void {
