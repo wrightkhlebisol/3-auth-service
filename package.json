@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.13.0",
-    "@wrightkhlebisol/jobber-shared": "^0.0.11",
+    "@wrightkhlebisol/jobber-shared": "^0.0.12",
     "amqplib": "^0.10.4",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
