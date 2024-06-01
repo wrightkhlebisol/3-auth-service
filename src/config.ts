@@ -1,3 +1,4 @@
+import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -10,9 +11,9 @@ class Config {
   public CLIENT_URL: string | undefined;
   public RABBITMQ_ENDPOINT: string | undefined;
   public MYSQL_HOST: string | undefined;
-  public CLOUD_NAME: string | undefined;
-  public CLOUD_API_KEY: string | undefined;
-  public CLOUD_API_SECRET: string | undefined;
+  public CLOUDINARY_NAME: string | undefined;
+  public CLOUDINARY_API_KEY: string | undefined;
+  public CLOUDINARY_API_SECRET: string | undefined;
   public ELASTIC_SEARCH_URL: string | undefined;
 
   constructor() {
@@ -23,10 +24,19 @@ class Config {
     this.CLIENT_URL = process.env.CLIENT_URL || '';
     this.RABBITMQ_ENDPOINT = process.env.RABBITMQ_ENDPOINT || '';
     this.MYSQL_HOST = process.env.MYSQL_HOST || '';
-    this.CLOUD_NAME = process.env.CLOUD_NAME || '';
-    this.CLOUD_API_KEY = process.env.CLOUD_API_KEY || '';
-    this.CLOUD_API_SECRET = process.env.CLOUD_API_SECRET || '';
+    this.CLOUDINARY_NAME = process.env.CLOUDINARY_NAME || '';
+    this.CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || '';
+    this.CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET || '';
     this.ELASTIC_SEARCH_URL = process.env.ELASTIC_SEARCH_URL || '';
+  }
+
+  public cloudinaryConfig(): void {
+    // console.log({})
+    cloudinary.config({
+      cloud_name: this.CLOUDINARY_NAME,
+      api_key: this.CLOUDINARY_API_KEY,
+      api_secret: this.CLOUDINARY_API_SECRET
+    });
   }
 }
 
