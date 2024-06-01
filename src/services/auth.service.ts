@@ -4,7 +4,6 @@ import { publishDirectMessage } from '@auth/queues/auth.producer';
 import { authChannel } from '@auth/server';
 import { IAuthBuyerMessageDetails, IAuthDocument, firstLetterUppercase } from '@wrightkhlebisol/jobber-shared';
 import { sign } from 'jsonwebtoken';
-import { lowerCase } from 'lodash';
 import { Model, Op } from 'sequelize';
 
 export async function createAuthUser(data: IAuthDocument): Promise<IAuthDocument> {
@@ -43,18 +42,18 @@ export async function getUserByUsernameOrEmail(username: string, email: string):
     where: {
       [Op.or]: [
         { username: firstLetterUppercase(username) },
-        { email: lowerCase(email) }
+        { email: email.toLowerCase() }
       ]
-    }
+    },
   }) as Model;
 
-  return user.dataValues;
+  return user?.dataValues;
 }
 
 export async function getUserByEmail(email: string): Promise<IAuthDocument> {
   const user: Model = await AuthModel.findOne({
     where: {
-      email: lowerCase(email),
+      email: email.toLowerCase(),
     }
   }) as Model;
 
