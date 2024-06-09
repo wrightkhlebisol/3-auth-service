@@ -13,8 +13,11 @@ import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import { createConnectionAndChannel } from '@auth/queues/connection';
+import { isAxiosError } from 'axios';
+import { StatusCodes } from 'http-status-codes';
 
 const SERVER_PORT = 4002;
+const DEFAULT_ERROR_CODE = 500;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'authenticationServer', 'debug');
 
 export let authChannel: Channel;
@@ -67,12 +70,34 @@ function startElasticSearchServer(): void {
 }
 
 function authErrorHandler(app: Application): void {
+  app.use('*', (req: Request, res: Response, next: NextFunction) => {
+    const fullUrl: string = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    log.log('error', `Route not found ${fullUrl}`);
+    res.status(StatusCodes.NOT_FOUND).json({
+      message: `Endpoint ${fullUrl} does not exist`
+    });
+    next();
+  });
+
   app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
     log.log('error', `AuthService ${error.comingFrom}:`, error);
+
     if (error instanceof CustomError) {
-      res.status(error.statusCode).json(error.serializeErrors());
+      res.status(error.statusCode).json({ message: error.message });
+      return next();
     }
-    next();
+
+    if (isAxiosError(error)) {
+      res.status(error?.response?.status ?? DEFAULT_ERROR_CODE).json({
+        message: error?.response?.data?.message ?? 'Error occured'
+      });
+      return next();
+    }
+
+    res.status(error.statusCode).json({
+      message: error.message
+    });
+    return next();
   });
 }
 
