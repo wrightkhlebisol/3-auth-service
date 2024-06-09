@@ -145,3 +145,4 @@ dist
 
 Dockerfile.dev
 .npmrc
+.DS_Store
